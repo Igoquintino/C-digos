@@ -130,11 +130,11 @@ No *buscar(No *raiz, char *nome)
 /*--> START BUSCAR 'COM CPF NESSE CASO' <--*/
 No *buscarCpf(No *raiz, int *cpf)
 {
-    if (raiz == NULL || strcmp(raiz->info->Nome, nome) == 0)
+    if (raiz == NULL || raiz->info->Nome == cpf)
         return raiz;
-    if (strcmp(raiz->info->Nome, nome) > 0)
-        return buscar(raiz->esq, nome);
-    return buscar(raiz->dir, nome);
+    if (raiz->info->CPF > cpf)
+        return buscar(raiz->esq, cpf);
+    return buscar(raiz->dir, cpf);
 }
 /*--> END BUSCAR 'COM CPF NESSE CASO' <--*/
 
