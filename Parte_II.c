@@ -89,9 +89,9 @@ No *deleteNodeCpf(No *root, Info *info)
 {
     if (root == NULL)
         return root;
-    if (strcmp(info->CPF, root->info->CPF) < 0)
+    if (info->CPF < root->info->CPF)
         root->esq = deleteNodeCpf(root->esq, info);
-    else if (strcmp(info->CPF, root->info->CPF) > 0)
+    else if (info->CPF > root->info->CPF)
         root->dir = deleteNodeCpf(root->dir, info);
     else
     {
@@ -119,13 +119,24 @@ No *deleteNodeCpf(No *root, Info *info)
 /*--> START BUSCAR 'COM NOME NESSE CASO' <--*/
 No *buscar(No *raiz, char *nome)
 {
+    if (raiz == NULL || strcmp(raiz->info->Nome, nome) == 0) /*--> compara o nome do nó na raiz com o nome a ser pesquisado<--*/
+        return raiz;/*-->Se forem iguais, significa que o nó foi encontrado, então a função retorna o nó raiz. <--*/
+    if (strcmp(raiz->info->Nome, nome) > 0) /*--> raiz for menor que o nome a ser pesquisado a função chama a si mesma recursivamente<--*/
+        return buscar(raiz->esq, nome);
+    return buscar(raiz->dir, nome);/*--> com o filho direito da raiz como a nova raiz. <--*/
+}
+/*--> END BUSCAR 'COM NOME NESSE CASO' <--*/
+
+/*--> START BUSCAR 'COM CPF NESSE CASO' <--*/
+No *buscarCpf(No *raiz, int *cpf)
+{
     if (raiz == NULL || strcmp(raiz->info->Nome, nome) == 0)
         return raiz;
     if (strcmp(raiz->info->Nome, nome) > 0)
         return buscar(raiz->esq, nome);
     return buscar(raiz->dir, nome);
 }
-/*--> END BUSCAR 'COM NOME NESSE CASO' <--*/
+/*--> END BUSCAR 'COM CPF NESSE CASO' <--*/
 
 /*--> START LIMPAR TELA <--*/
 void limparTela()
