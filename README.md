@@ -2,7 +2,7 @@
 ## Autor: Igo Quintino
  -Autor: Igo Quintino
  -Aluno de Sistemas de informaçoes
--Data de criação: 06/11/2023
+ -Data de criação: 06/11/2023
 
  No momento presente, o codigo estar implementando as respectivas arvores binarias "CPF" e "NOME"
  mais ainda falta a implementacao de 'busca por cpf e delete por cpf' ja que essa funcoes nao tao
