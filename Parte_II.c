@@ -16,13 +16,13 @@ typedef struct t_no
     struct t_no *esq;
     struct t_no *dir;
 } No;
-/*--> END ESTRUTURA DEFINIDAS <--*/
 
 No *arvoreCPF;
 No *arvoreNome;
+/*--> END ESTRUTURA DEFINIDAS <--*/
 
-/*--> START INSERIR NO <--*/
-No *inserir(No *raiz, Info *info)
+/*--> START INSERIR NO NOME<--*/
+No *inserirNome(No *raiz, Info *info)
 {
     if (raiz == NULL)
     {
@@ -32,12 +32,16 @@ No *inserir(No *raiz, Info *info)
         return novo;
     }
     if (strcmp(info->Nome, raiz->info->Nome) < 0)
-        raiz->esq = inserir(raiz->esq, info);
+        raiz->esq = inserirNome(raiz->esq, info);
     else if (strcmp(info->Nome, raiz->info->Nome) > 0)
-        raiz->dir = inserir(raiz->dir, info);
+        raiz->dir = inserirNome(raiz->dir, info);
     return raiz;
 }
-/*--> END INSERIR NO <--*/
+/*--> END INSERIR NO COM NOME<--*/
+
+/*--> START INSERIR NO COM CPF<--*/
+
+/*--> END INSERIR NO COM CPF<--*/
 
 
 
@@ -82,7 +86,7 @@ No *deleteNode(No *root, Info *info)
     }
     return root;
 }
-/*--> END DELETE NO <--*/
+/*--> END DELETE NO 'COM NOME NO CASO'<--*/
 
 /*--> START DELETAR NO 'COM CPF NESSE CASO' <--*/
 No *deleteNodeCpf(No *root, Info *info)
@@ -133,10 +137,14 @@ No *buscarCpf(No *raiz, int *cpf)
     if (raiz == NULL || raiz->info->Nome == cpf)
         return raiz;
     if (raiz->info->CPF > cpf)
-        return buscar(raiz->esq, cpf);
-    return buscar(raiz->dir, cpf);
+        return buscarCpf(raiz->esq, cpf);
+    return buscarCpf(raiz->dir, cpf);
 }
 /*--> END BUSCAR 'COM CPF NESSE CASO' <--*/
+
+
+/*--> ************************************************************************************************** <--*/
+/*--> ************************************************************************************************** <--*/
 
 /*--> START LIMPAR TELA <--*/
 void limparTela()
@@ -148,6 +156,73 @@ void limparTela()
 }
 /*--> END 'LIMPAR TELA' <--*/
 
+/*--> START INTRODUZIR FUNC DENTRO NO MAIN <--*/
+void introduce()
+{
+    Info *info = (Info *)malloc(sizeof(Info));
+    printf("Digite o nome do funcionário: ");
+    scanf("%s", info->Nome);
+    printf("Digite o CPF do funcionário: ");
+    scanf("%d", &info->CPF);
+    printf("Digite a profissão do funcionário: ");
+    scanf("%s", info->Profissao);
+    arvoreCPF = inserirCpf(arvoreCPF, info);
+    arvoreNome = inserir(arvoreNome, info);
+    limparTela();
+}
+/*--> END INTRODUZIR FUNC DENTRO DO MAIN <--*/
+
+/*--> START REMOVER COM NOME NO MAIN <--*/
+void removeFunName()
+{
+    char nome[50];
+    printf("Digite o nome do funcionário: ");
+    scanf("%s", nome);
+    arvoreCPF = deleteNode(arvoreCPF, buscar(arvoreNome, nome)->info);
+    arvoreNome = deleteNode(arvoreNome, buscar(arvoreNome, nome)->info);
+    limparTela();
+}
+/*--> END REMOVER COM NOME NO MAIN <--*/
+
+/*--> START BUSCAR COM NOME NO MAIN <--*/
+void searchFunName()
+{
+    char nome[50];
+    printf("Digite o nome do funcionário: ");
+    scanf("%s", nome);
+    No *no = buscar(arvoreNome, nome);
+    if (no != NULL)
+    {
+        printf("CPF: %d, Profissão: %s\n", no->info->CPF, no->info->Profissao);
+    }
+    else
+    {
+        printf("Funcionário não encontrado.\n");
+    }
+}
+/*--> END BUSCAR COM NOME NO MAIN <--*/
+
+/*--> START REMOVE COM CPF NO MAIN <--*/
+void removeFunCpf()
+{
+    int cpf;
+    printf("Digite o 'cpf' do funcionário: "); scanf("%d", cpf);
+    No *no = buscarCpf(arvoreCPF, cpf);
+    (no != NULL) ? printf("CPF: %d, Profissão: %s\n", no->info->CPF, no->info->Profissao) : printf("Funcionário não encontrado.\n"); 
+    limparTela();
+}
+/*--> END REMOVE COM CPF NO MAIN <--*/
+
+/*--> START BUSCAR COM CPF NO MAIN <--*/
+void searchFunCpf()
+{
+
+}
+/*--> END BUSCAR COM CPF NO MAIN <--*/
+
+
+/*--> ************************************************************************************************** <--*/
+/*--> ************************************************************************************************** <--*/
 int main()
 {
     arvoreCPF = NULL;
@@ -164,56 +239,21 @@ int main()
         scanf("%d", &opcao);
         switch (opcao)
         {
-        case 1:
-        {
-            limparTela();
-            Info *info = (Info *)malloc(sizeof(Info));
-            printf("Digite o nome do funcionário: ");
-            scanf("%s", info->Nome);
-            printf("Digite o CPF do funcionário: ");
-            scanf("%d", &info->CPF);
-            printf("Digite a profissão do funcionário: ");
-            scanf("%s", info->Profissao);
-            arvoreCPF = inserir(arvoreCPF, info);
-            arvoreNome = inserir(arvoreNome, info);
-            limparTela();
-            break;
-        }
-        case 2:
-        {
-            limparTela();
-            char nome[50];
-            printf("Digite o nome do funcionário: ");
-            scanf("%s", nome);
-            arvoreCPF = deleteNode(arvoreCPF, buscar(arvoreNome, nome)->info);
-            arvoreNome = deleteNode(arvoreNome, buscar(arvoreNome, nome)->info);
-            limparTela();
-            break;
-        }
-        case 3:
-        {
-            limparTela();
-            char nome[50];
-            printf("Digite o nome do funcionário: ");
-            scanf("%s", nome);
-            No *no = buscar(arvoreNome, nome);
-            if (no != NULL)
-            {
-                printf("CPF: %d, Profissão: %s\n", no->info->CPF, no->info->Profissao);
-            }
-            else
-            {
-                printf("Funcionário não encontrado.\n");
-            }
-            break;
-        }
-        case 4:
-            system("pause");
-            return 0;
+        case 1: introduce; break;
+        case 2: removeFunName(); break;
+        case 3: searchFunName(); break;
+        case 4: removeFunCpf(); break;
+            
+        case 5: searchFunCpf(); break;
         default:
+            system("pause");
             printf("Opção inválida.\n");
+            break;
         }
     }
     system("pause");
     return 0;
 }
+
+/*o sistema estar com bug nos casos */
+/*teste os caso antes*/
