@@ -114,7 +114,7 @@ No *deleteNodeCpf(No *root, Info *info) {
         }
         No *temp = minValueNode(root->dir);
         root->info = temp->info;
-        root->dir = deleteNode(root->dir, temp->info);
+        root->dir = deleteNodeCpf(root->dir, temp->info);
     }
     return root;
 }
@@ -152,110 +152,108 @@ void limparTela() {
 /*--> END 'LIMPAR TELA' <--*/
 
 /*--> START INTRODUZIR FUNC DENTRO NO MAIN <--*/
-void introduce()
-{
-    Info *info = (Info *)malloc(sizeof(Info));
-    printf("Digite o nome do funcionário: ");
-    scanf("%s", info->Nome);
-    printf("Digite o CPF do funcionário: ");
-    scanf("%d", &info->CPF);
-    printf("Digite a profissão do funcionário: ");
-    scanf("%s", info->Profissao);
-    arvoreCPF = inserirCpf(arvoreCPF, info);
-    arvoreNome = inserir(arvoreNome, info);
-    limparTela();
-}
+// void introduce()
+// {
+//     Info *info = (Info *)malloc(sizeof(Info));
+//     printf("Digite o nome do funcionário: ");
+//     scanf("%s", info->Nome);
+//     printf("Digite o CPF do funcionário: ");
+//     scanf("%d", &info->CPF);
+//     printf("Digite a profissão do funcionário: ");
+//     scanf("%s", info->Profissao);
+//     arvoreCPF = inserirCpf(arvoreCPF, info);
+//     arvoreNome = inserir(arvoreNome, info);
+//     limparTela();
+// }
 /*--> END INTRODUZIR FUNC DENTRO DO MAIN <--*/
 
 /*--> START REMOVER COM NOME NO MAIN <--*/
-void removeFunName()
-{
-    char nome[50];
-    printf("Digite o nome do funcionário: ");
-    scanf("%s", nome);
-    arvoreCPF = deleteNode(arvoreCPF, buscar(arvoreNome, nome)->info);
-    arvoreNome = deleteNode(arvoreNome, buscar(arvoreNome, nome)->info);
-    limparTela();
-}
+// void removeFunName()
+// {
+//     char nome[50];
+//     printf("Digite o nome do funcionário: ");
+//     scanf("%s", nome);
+//     arvoreCPF = deleteNode(arvoreCPF, buscar(arvoreNome, nome)->info);
+//     arvoreNome = deleteNode(arvoreNome, buscar(arvoreNome, nome)->info);
+//     limparTela();
+// }
 /*--> END REMOVER COM NOME NO MAIN <--*/
 
 /*--> START BUSCAR COM NOME NO MAIN <--*/
-void searchFunName()
-{
-    char nome[50];
-    printf("Digite o nome do funcionário: ");
-    scanf("%s", nome);
-    No *no = buscar(arvoreNome, nome);
-    if (no != NULL)
-    {
-        printf("CPF: %d, Profissão: %s\n", no->info->CPF, no->info->Profissao);
-    }
-    else
-    {
-        printf("Funcionário não encontrado.\n");
-    }
-}
+// void searchFunName()
+// {
+//     char nome[50];
+//     printf("Digite o nome do funcionário: ");
+//     scanf("%s", nome);
+//     No *no = buscar(arvoreNome, nome);
+//     if (no != NULL)
+//     {
+//         printf("CPF: %d, Profissão: %s\n", no->info->CPF, no->info->Profissao);
+//     }
+//     else
+//     {
+//         printf("Funcionário não encontrado.\n");
+//     }
+// }
 /*--> END BUSCAR COM NOME NO MAIN <--*/
 
 /*--> START REMOVE COM CPF NO MAIN <--*/
-void removeFunCpf()
-{
-    int cpf;
-    printf("Digite o 'cpf' do funcionário: ");
-    scanf("%d", cpf);
-    No *no = buscarCpf(arvoreCPF, cpf);
-    (no != NULL) ? printf("CPF: %d, Profissão: %s\n", no->info->CPF, no->info->Profissao) : printf("Funcionário não encontrado.\n");
-    limparTela();
-}
+// void removeFunCpf()
+// {
+//     int cpf;
+//     printf("Digite o 'cpf' do funcionário: ");
+//     scanf("%d", cpf);
+//     No *no = buscarCpf(arvoreCPF, cpf);
+//     (no != NULL) ? printf("CPF: %d, Profissão: %s\n", no->info->CPF, no->info->Profissao) : printf("Funcionário não encontrado.\n");
+//     limparTela();
+// }
 /*--> END REMOVE COM CPF NO MAIN <--*/
 
 /*--> START BUSCAR COM CPF NO MAIN <--*/
-void searchFunCpf()
-{
-}
+// void searchFunCpf()
+// {
+// }
 /*--> END BUSCAR COM CPF NO MAIN <--*/
 
 /*--> ************************************************************************************************** <--*/
 /*--> ************************************************************************************************** <--*/
-int main()
-{
-    arvoreCPF = NULL;
-    arvoreNome = NULL;
+int main() {
+    // Criação do nó raiz
+    Info *info = malloc(sizeof(Info));
+    strcpy(info->Nome, "João");
+    info->CPF = 123456789;
+    No *raiz = inserirCpf(NULL, info);
 
-    /*--> START TELA DE LOGIN' <--*/
-    while (1)
-    {
-        printf("1. Inserir funcionário\n");   /*--> 'ta inserindo normalmente, isso nao precisa mudar no seu back' <--*/
-        printf("2. Remover funcionário\n");   /*--> 'aqui, como dito acima, o remover estar atrelado ao nome' <--*/
-        printf("3. Consultar funcionário\n"); /*--> 'tambem só esta consultado a partir de uma pesquisa por nome na arvore binaria criada' <--*/
-        printf("4. Sair\n");
-        int opcao;
-        scanf("%d", &opcao);
-        switch (opcao)
-        {
-        case 1:
-            introduce;
-            break;
-        case 2:
-            removeFunName();
-            break;
-        case 3:
-            searchFunName();
-            break;
-        case 4:
-            removeFunCpf();
-            break;
+    // Inserção de mais nós
+    Info *info2 = malloc(sizeof(Info));
+    strcpy(info2->Nome, "Maria");
+    info2->CPF = 987654321;
+    raiz = inserirCpf(raiz, info2);
 
-        case 5:
-            searchFunCpf();
-            break;
-        default:
-            system("pause");
-            printf("Opção inválida.\n");
-            break;
-        }
+    // Busca de um nó
+    No *noEncontrado = buscarCpf(raiz, 987654321);
+    if (noEncontrado != NULL) {
+        printf("Nó encontrado: %s, %d\n", noEncontrado->info->Nome, noEncontrado->info->CPF);
+    } else {
+        printf("Nó não encontrado\n");
     }
-    system("pause");
+
+    // Remoção de um nó
+    raiz = deleteNodeCpf(raiz, info2);
+
+    // Busca do mesmo nó após a remoção
+    noEncontrado = buscarCpf(raiz, 987654321);
+    if (noEncontrado != NULL) {
+        printf("Nó encontrado: %s, %d\n", noEncontrado->info->Nome, noEncontrado->info->CPF);
+    } else {
+        printf("Nó não encontrado\n");
+    }
+
+    // Liberação de memória
+    free(info);
+    free(info2);
+    free(raiz);
+
     return 0;
 }
 
