@@ -15,4 +15,6 @@
  binaria, onde a mesma é criada a partir do momento que voce como usuario vai adicionando 'usuarios'
  ademais é isso.
 
+ atualizando, as funções de remover e buscar em ambas as arvores estão corretas. 12/11/2023
+
  De Igo Quintino
