@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <regex.h>
 
 /*--> START ESTRUTURA DEFINIDAS <--*/
 typedef struct
