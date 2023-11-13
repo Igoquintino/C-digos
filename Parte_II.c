@@ -145,8 +145,23 @@ No *buscarCpf(No *raiz, int cpf) {
 }
 /*--> END BUSCAR 'COM CPF NESSE CASO' <--*/
 
-Info *info = NULL;
 void freeTree(No *root);
+Info *info = NULL;
+
+void freeTree(No *root) {
+        if (root == NULL) return;
+        freeTree(root->esq);
+        freeTree(root->dir);
+        free(root->info);
+        free(root);
+    }
+
+
+  void freeMemory() {
+    freeTree(arvoreCPF);
+    freeTree(arvoreNome);
+    free(info);  // Free the memory allocated for info
+    }
 
 /*--> ************************************************************************************************** <--*/
 /*--> ************************************************************************************************** <--*/
@@ -185,21 +200,8 @@ int main() {
     printf("*   S                                                     *\n");
     printf("***********************************************************\n");
     printf(" \n");
-    printf(" \n");
-
-    void freeTree(No *root) {
-        if (root == NULL) return;
-        freeTree(root->esq);
-        freeTree(root->dir);
-        free(root->info);
-        free(root);
-    }
-
-    void freeMemory() {
-    freeTree(arvoreCPF);
-    freeTree(arvoreNome);
-    free(info);  // Free the memory allocated for info
-    }
+    printf(" \n");  
+  
 
    while (1) {
     printf("escreva o primeiro comando\n");
@@ -246,7 +248,7 @@ int main() {
             strcpy(info->Nome, name);
             No *result = buscar(arvoreNome, info->Nome);
             if(result != NULL) {
-                printf("Funcionário encontrado: %s, %s, %s\n", result->info->Nome, result->info->CPF, result->info->Profissao);
+                printf("Funcionário encontrado: %s, %d, %s\n", result->info->Nome, result->info->CPF, result->info->Profissao);
             } else {
                 printf("Funcionário não encontrado!\n");
             }
@@ -257,7 +259,7 @@ int main() {
             info->CPF = atoi(cpf);
             No *result = buscarCpf(arvoreCPF, info->CPF);
             if(result != NULL) {
-                printf("Funcionário encontrado: %s, %s, %s\n", result->info->Nome, result->info->CPF, result->info->Profissao);
+                printf("Funcionário encontrado: %s, %d, %s\n", result->info->Nome, result->info->CPF, result->info->Profissao);
             } else {
                 printf("Funcionário não encontrado!\n");
             }
