@@ -76,8 +76,7 @@ No *deleteNodeNome(No *root, Info *info) {
         root->esq = deleteNodeNome(root->esq, info);
     else if (strcmp(info->Nome, root->info->Nome) > 0)
         root->dir = deleteNodeNome(root->dir, info);
-    else
-    {
+    else {
         if (root->esq == NULL) {
             No *temp = root->dir;
             free(root);
@@ -134,6 +133,25 @@ No *buscar(No *raiz, char *nome) {
     return buscar(raiz->dir, nome); /*--> com o filho direito da raiz como a nova raiz. <--*/
 }
 /*--> END BUSCAR 'COM NOME NESSE CASO' <--*/
+
+
+/*--> START LISTAR <--*/
+void exibirFuncionarios(No *raiz, int cont) {
+    if (raiz != NULL) {
+        exibirFuncionarios(raiz->esq, cont);
+        printf("func : %s\t%d\t%s\n", raiz->info->Nome, raiz->info->CPF, raiz->info->Profissao);
+        exibirFuncionarios(raiz->dir,cont);
+    }
+}
+/*--> END LISTAR <--*/
+
+int countNodes(No *root) {
+    if (root == NULL)
+        return 0;
+    else
+        return (countNodes(root->esq) + countNodes(root->dir) + 1);
+}
+
 
 /*--> START BUSCAR 'COM CPF NESSE CASO' <--*/
 No *buscarCpf(No *raiz, int cpf) {
@@ -199,17 +217,16 @@ int main() {
     printf("*   r c <CPF>                                             *\n");
     printf("*   b n <Nome>                                            *\n");
     printf("*   b c <CPF>                                             *\n");
-    printf("*   S                                                     *\n");
+    printf("*   l <listar com Cpf>                                    *\n");
     printf("***********************************************************\n");
-    printf(" \n");
     printf(" \n");  
-  
 
    while (1) {
     printf("Escreva o seu comando\n");
     scanf("%s", command);
     limparTela();
-
+    int count = 0;
+    int countCPF = 0;
     switch (command[0]) {
     case 'i':
         printf("add um funcionario: ");
@@ -267,10 +284,21 @@ int main() {
             }
         }
         break;
+
+    case 'l':
+        printf("Listar funcionários\n");
+        printf("\tNome\tCPF\tProfissão\n");
+        exibirFuncionarios(arvoreNome, count); count++;
+        exibirFuncionarios(arvoreCPF, countCPF); countCPF++;
+        printf("Total de funcionários: %d\n", countNodes(arvoreNome));
+        break;
+
+
     case 'S':
         freeMemory();
         printf("Programa finalizado com sucesso!\n");
         return 0;
+
     default:
         printf("Comando inválido!\n");
         break;
