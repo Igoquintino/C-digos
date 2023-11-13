@@ -166,12 +166,14 @@ void freeTree(No *root) {
 /*--> ************************************************************************************************** <--*/
 /*--> ************************************************************************************************** <--*/
 
-int cmpChar(const char array[], int index1, int index2){
-    if (array[index1] == array[index2])
-        return 1; // Caracteres são iguais
-    else 
-        return 0; // Caracteres são diferentes
+/*--> START LIMPAR TELA <--*/
+void limparTela() {
+    for (int i = 0; i < 40; i++) {
+        printf(" \n");
+    }
 }
+/*--> END 'LIMPAR TELA' <--*/
+
 
 /*--> ************************************************************************************************** <--*/
 /*--> ************************************************************************************************** <--*/
@@ -204,12 +206,12 @@ int main() {
   
 
    while (1) {
-    printf("escreva o primeiro comando\n");
+    printf("Escreva o seu comando\n");
     scanf("%s", command);
+    limparTela();
 
     switch (command[0]) {
     case 'i':
-        freeMemory();
         printf("add um funcionario: ");
         scanf("%s %s %s", name, cpf, profession);
         info = (Info *)malloc(sizeof(Info));  // Allocate memory for info
@@ -219,6 +221,7 @@ int main() {
         arvoreCPF = inserirCpf(arvoreCPF, info);
         arvoreNome = inserirNome(arvoreNome, info);
         printf("Funcionário adicionado com sucesso!\n");
+        limparTela();
         break;
 
     case 'r':
@@ -241,7 +244,6 @@ int main() {
         }
         break;
     case 'b':
-        printf("buscar com\n");
         scanf("%s", name);
         if (command[1] == 'n') {
             printf("buscar com nome\n");
