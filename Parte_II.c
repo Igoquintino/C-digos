@@ -34,8 +34,6 @@ No *inserirNome(No *raiz, Info *info) {
         raiz->dir = inserirNome(raiz->dir, info);
     return raiz;
 }
-/*--> END INSERIR NO COM NOME<--*/
-
 
 /*--> START INSERIR NO COM CPF<--*/
 No *inserirCpf(No *raiz, Info *info) {
@@ -55,7 +53,6 @@ No *inserirCpf(No *raiz, Info *info) {
         raiz->dir = inserirCpf(raiz->dir, info);
     return raiz;
 }
-/*--> END INSERIR NO COM CPF<--*/
 
 
 /*--> START NO VALOR MINIMO <--*/
@@ -93,7 +90,6 @@ No *deleteNodeNome(No *root, Info *info) {
     }
     return root;
 }
-/*--> END DELETE NO 'COM NOME NO CASO'<--*/
 
 
 /*--> START DELETAR NO 'COM CPF NESSE CASO' <--*/
@@ -121,7 +117,6 @@ No *deleteNodeCpf(No *root, Info *info){
     }
     return root;
 }
-/*--> END DELETE NO CPF <--*/
 
 
 /*--> START BUSCAR 'COM NOME NESSE CASO' <--*/
@@ -132,7 +127,16 @@ No *buscar(No *raiz, char *nome) {
         return buscar(raiz->esq, nome);
     return buscar(raiz->dir, nome); /*--> com o filho direito da raiz como a nova raiz. <--*/
 }
-/*--> END BUSCAR 'COM NOME NESSE CASO' <--*/
+
+
+/*--> START BUSCAR 'COM CPF NESSE CASO' <--*/
+No *buscarCpf(No *raiz, int cpf) {
+    if (raiz == NULL || raiz->info->CPF == cpf)
+        return raiz;
+    if (raiz->info->CPF > cpf)
+        return buscarCpf(raiz->esq, cpf);
+    return buscarCpf(raiz->dir, cpf);
+}
 
 
 /*--> START LISTAR <--*/
@@ -153,15 +157,6 @@ int countNodes(No *root) {
 }
 
 
-/*--> START BUSCAR 'COM CPF NESSE CASO' <--*/
-No *buscarCpf(No *raiz, int cpf) {
-    if (raiz == NULL || raiz->info->CPF == cpf)
-        return raiz;
-    if (raiz->info->CPF > cpf)
-        return buscarCpf(raiz->esq, cpf);
-    return buscarCpf(raiz->dir, cpf);
-}
-/*--> END BUSCAR 'COM CPF NESSE CASO' <--*/
 
 void freeTree(No *root);
 Info *info = NULL;
@@ -196,7 +191,34 @@ void limparTela() {
 /*--> ************************************************************************************************** <--*/
 /*--> ************************************************************************************************** <--*/
 int main() {
-    // Info *info = NULL;
+    /*--> Dados testes <--*/
+    // Criação de dados de teste
+    Info *teste1 = (Info *)malloc(sizeof(Info));
+    teste1->CPF = 123456;
+    strcpy(teste1->Nome, "João");
+    strcpy(teste1->Profissao, "Engenheiro");
+
+    Info *teste2 = (Info *)malloc(sizeof(Info));
+    teste2->CPF = 789012;
+    strcpy(teste2->Nome, "Maria");
+    strcpy(teste2->Profissao, "Médica");
+
+    Info *teste3 = (Info *)malloc(sizeof(Info));
+    teste3->CPF = 345678;
+    strcpy(teste3->Nome, "Pedro");
+    strcpy(teste3->Profissao, "Professor");
+
+    // Inserção dos dados de teste nas árvores
+    arvoreCPF = inserirCpf(arvoreCPF, teste1);
+    arvoreNome = inserirNome(arvoreNome, teste1);
+
+    arvoreCPF = inserirCpf(arvoreCPF, teste2);
+    arvoreNome = inserirNome(arvoreNome, teste2);
+
+    arvoreCPF = inserirCpf(arvoreCPF, teste3);
+    arvoreNome = inserirNome(arvoreNome, teste3);
+/*--> End dados testes <--*/
+    
     char command[2];
     char name[50];
     char cpf[12];
@@ -242,24 +264,28 @@ int main() {
         break;
 
     case 'r':
-        printf("remover\n");
-        scanf("%s", name);
-        if (command[1] == 'n') {
-            printf("remover com nome\n");
-            strcpy(info->Nome, name);
-            arvoreCPF = deleteNodeNome(arvoreCPF, info);
-            arvoreNome = deleteNodeNome(arvoreNome, info);
-            printf("Funcionário removido com sucesso!\n");
-        }
-        else if (command[1] == 'c') {
-            printf("remover com cpf\n");
-            scanf("%s", cpf);
-            info->CPF = atoi(cpf);
-            arvoreCPF = deleteNodeCpf(arvoreCPF, info);
-            arvoreNome = deleteNodeCpf(arvoreNome, info);
-            printf("Funcionário removido com sucesso!\n");
-        }
-        break;
+    printf("remover\n");
+    scanf("%s", name);
+    if (command[1] == 'n') {
+        printf("remover com nome\n");
+        Info *infoNome = (Info *)malloc(sizeof(Info));
+        strcpy(infoNome->Nome, name);
+        arvoreCPF = deleteNodeNome(arvoreCPF, infoNome);
+        arvoreNome = deleteNodeNome(arvoreNome, infoNome);
+        free(infoNome);
+        printf("Funcionário removido com sucesso!\n");
+    }
+    else if (command[1] == 'c') {
+        printf("remover com cpf\n");
+        scanf("%s", cpf);
+        Info *infoCpf = (Info *)malloc(sizeof(Info));
+        infoCpf->CPF = atoi(cpf);
+        arvoreCPF = deleteNodeCpf(arvoreCPF, infoCpf);
+        arvoreNome = deleteNodeCpf(arvoreNome, infoCpf);
+        free(infoCpf);
+        printf("Funcionário removido com sucesso!\n");
+    }
+    break;
     case 'b':
         scanf("%s", name);
         if (command[1] == 'n') {
@@ -289,7 +315,7 @@ int main() {
         printf("Listar funcionários\n");
         printf("\tNome\tCPF\tProfissão\n");
         exibirFuncionarios(arvoreNome, count); count++;
-        exibirFuncionarios(arvoreCPF, countCPF); countCPF++;
+        // exibirFuncionarios(arvoreCPF, countCPF); countCPF++;
         printf("Total de funcionários: %d\n", countNodes(arvoreNome));
         break;
 
@@ -304,7 +330,6 @@ int main() {
         break;
     }
 }
-
     return 0;
 }
 
