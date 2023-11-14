@@ -1,262 +1,285 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <regex.h>
+#include <stdbool.h>
+#include <locale.h>
 
-/*--> START ESTRUTURA DEFINIDAS <--*/
-typedef struct
-{
+typedef struct {
     int CPF;
     char Nome[50];
     char Profissao[30];
 } Info;
 
-typedef struct t_no
-{
-    Info *info;
+typedef struct t_no {
+    Info info;
     struct t_no *esq;
     struct t_no *dir;
 } No;
 
-No *arvoreCPF;
-No *arvoreNome;
-/*--> END ESTRUTURA DEFINIDAS <--*/
+No *arvoreCPF = NULL;
+No *arvoreNome = NULL;
 
-/*--> START INSERIR NO NOME<--*/
-No *inserirNome(No *raiz, Info *info) {
-    if (raiz == NULL) {
-        No *novo = (No *)malloc(sizeof(No)); /**/
-        novo->info = info;
-        novo->esq = novo->dir = NULL;
-        return novo;
+bool verificaComando(char *entrada) {
+    if (entrada[0] != 'i' && entrada[0] != 'r') {
+        return false;
     }
-    if (strcmp(info->Nome, raiz->info->Nome) < 0)
-        raiz->esq = inserirNome(raiz->esq, info);
-    else if (strcmp(info->Nome, raiz->info->Nome) > 0)
-        raiz->dir = inserirNome(raiz->dir, info);
-    return raiz;
-}
-/*--> END INSERIR NO COM NOME<--*/
 
-/*--> START INSERIR NO COM CPF<--*/
-No *inserirCpf(No *raiz, Info *info) {
+    if (entrada[1] != ' ') {
+        return false;
+    }
+
+    if (entrada[2] == '\0') {
+        return false;
+    }
+
+    char nome[50];
+    int cpf;
+    char profissao[30];
+
+    // Tente ler três argumentos usando o formato esperado
+    if (sscanf(entrada + 2, "%49s %d %29s", nome, &cpf, profissao) == 3) {
+        return true;
+    }
+
+    return false;
+}
+
+No *inserirFuncionario(No *raiz, Info *info) {
     if (raiz == NULL) {
-        No *novoCpf = (No *)malloc(sizeof(No));
-        if (novoCpf == NULL) {
+        No *novo = (No *)malloc(sizeof(No));
+        if (novo == NULL) {
             fprintf(stderr, "Falha na alocação de memória\n");
             exit(EXIT_FAILURE);
         }
-        novoCpf->info = info;
-        novoCpf->esq = novoCpf->dir = NULL;
-        return novoCpf;
+        novo->info = *info;
+        novo->esq = novo->dir = NULL;
+        return novo;
     }
-    if (info->CPF < raiz->info->CPF)
-        raiz->esq = inserirCpf(raiz->esq, info);
-    else if (info->CPF > raiz->info->CPF)
-        raiz->dir = inserirCpf(raiz->dir, info);
+
+    if (strcasecmp(info->Nome, raiz->info.Nome) < 0)
+        raiz->esq = inserirFuncionario(raiz->esq, info);
+    else if (strcasecmp(info->Nome, raiz->info.Nome) > 0)
+        raiz->dir = inserirFuncionario(raiz->dir, info);
     return raiz;
 }
-/*--> END INSERIR NO COM CPF<--*/
 
-/*--> START NO VALOR MINIMO <--*/
-No *minValueNode(No *node) { 
-    No *current = node;
-    while (current && current->esq != NULL) /*--> basicamente a funcao para achar o menor valor de no na arvore, que logicamente ta a esquerda <--*/
-        current = current->esq;
-    return current; /*--> retorna esse valor minimo de 'no' na arvore, que logicamente ta a esquerda, o que esta a mais esquerda <--*/
+/*Start remover com ambos*/
+No* minValueNodeNome(No* node) {
+   No* current = node;
+   while (current && current->esq != NULL)
+       current = current->esq;
+   return current;
 }
-/*--> END NO VALOR MINIMO <--*/
 
-/*--> START DELETAR NO 'COM NOME NESSE CASO' <--*/
-No *deleteNodeNome(No *root, Info *info) {
-    if (root == NULL)
-        return root;
-    if (strcmp(info->Nome, root->info->Nome) < 0)
-        root->esq = deleteNodeNome(root->esq, info);
-    else if (strcmp(info->Nome, root->info->Nome) > 0)
-        root->dir = deleteNodeNome(root->dir, info);
-    else {
-        if (root->esq == NULL) {
-            No *temp = root->dir;
-            free(root);
-            return temp;
-        }
-        else if (root->dir == NULL) {
-            No *temp = root->esq;
-            free(root);
-            return temp;
-        }
-        No *temp = minValueNode(root->dir);
-        root->info = temp->info;
-        root->dir = deleteNodeNome(root->dir, temp->info);
+No* minValueNodeCPF(No* node) {
+   No* current = node;
+   while (current && current->esq != NULL)
+       current = current->esq;
+   return current;
+}
+
+No* removeFuncionario(No* raiz, char* chave, int tipo) {
+   if (raiz == NULL) {
+       return raiz;
+   }
+   // Chave a ser removida é menor que a chave da raiz
+   if (tipo == 1 && strcasecmp(chave, raiz->info.Nome) < 0) {
+       raiz->esq = removeFuncionario(raiz->esq, chave, tipo);
+   }
+   else if (tipo == 2 && atoi(chave) < raiz->info.CPF) {
+       raiz->esq = removeFuncionario(raiz->esq, chave, tipo);
+   }
+   // Chave a ser removida é maior que a chave da raiz
+   else if (tipo == 1 && strcasecmp(chave, raiz->info.Nome) > 0) {
+       raiz->dir = removeFuncionario(raiz->dir, chave, tipo);
+   }
+   else if (tipo == 2 && atoi(chave) > raiz->info.CPF) {
+       raiz->dir = removeFuncionario(raiz->dir, chave, tipo);
+   }
+   // Chave a ser removida é igual à chave da raiz
+   else {
+       // Nó com um ou nenhum filho
+       if (raiz->esq == NULL) {
+           No* temp = raiz->dir;
+           free(raiz);
+           return temp;
+       }
+       else if (raiz->dir == NULL) {
+           No* temp = raiz->esq;
+           free(raiz);
+           return temp;
+       }
+       // Nó com dois filhos
+       No* temp;
+       if (tipo == 1) {
+           temp = minValueNodeNome(raiz->dir);
+           raiz->info = temp->info;
+           raiz->dir = removeFuncionario(raiz->dir, temp->info.Nome, tipo);
+       }
+       else {
+           temp = minValueNodeCPF(raiz->dir);
+           raiz->info = temp->info;
+           char bun[12];
+           sprintf(bun,"%d", temp->info.CPF);
+           raiz->dir = removeFuncionario(raiz->dir, bun, tipo);
+       }
+   }
+   return raiz;
+}
+No* buscarFuncionario(No* raiz, char* chave, int tipo) {
+    if (raiz == NULL) {
+        return NULL;
     }
-    return root;
-}
-/*--> END DELETE NO 'COM NOME NO CASO'<--*/
-
-/*--> START DELETAR NO 'COM CPF NESSE CASO' <--*/
-No *deleteNodeCpf(No *root, Info *info) {
-    if (root == NULL)
-        return root;
-    if (info->CPF < root->info->CPF)
-        root->esq = deleteNodeCpf(root->esq, info);
-    else if (info->CPF > root->info->CPF)
-        root->dir = deleteNodeCpf(root->dir, info);
-    else {
-        if (root->esq == NULL) {
-            No *temp = root->dir;
-            free(root);
-            return temp;
-        }
-        else if (root->dir == NULL) {
-            No *temp = root->esq;
-            free(root);
-            return temp;
-        }
-        No *temp = minValueNode(root->dir);
-        root->info = temp->info;
-        root->dir = deleteNodeCpf(root->dir, temp->info);
-    }
-    return root;
-}
-/*--> END DELETE NO CPF <--*/
-
-/*--> START BUSCAR 'COM NOME NESSE CASO' <--*/
-No *buscar(No *raiz, char *nome) {
-    if (raiz == NULL || strcmp(raiz->info->Nome, nome) == 0) /*--> compara o nome do nó na raiz com o nome a ser pesquisado<--*/
-        return raiz;                                         /*-->Se forem iguais, significa que o nó foi encontrado, então a função retorna o nó raiz. <--*/
-    if (strcmp(raiz->info->Nome, nome) > 0)                  /*--> raiz for menor que o nome a ser pesquisado a função chama a si mesma recursivamente<--*/
-        return buscar(raiz->esq, nome);
-    return buscar(raiz->dir, nome); /*--> com o filho direito da raiz como a nova raiz. <--*/
-}
-/*--> END BUSCAR 'COM NOME NESSE CASO' <--*/
-
-/*--> START BUSCAR 'COM CPF NESSE CASO' <--*/
-No *buscarCpf(No *raiz, int cpf) {
-    if (raiz == NULL || raiz->info->CPF == cpf)
+    if (tipo == 1 && strcasecmp(chave, raiz->info.Nome) == 0) {
         return raiz;
-    if (raiz->info->CPF > cpf)
-        return buscarCpf(raiz->esq, cpf);
-    return buscarCpf(raiz->dir, cpf);
+    } else if (tipo == 2 && atoi(chave) == raiz->info.CPF) {
+        return raiz;
+    } else if (tipo == 1 && strcasecmp(chave, raiz->info.Nome) < 0) {
+        return buscarFuncionario(raiz->esq, chave, tipo);
+    } else if (tipo == 2 && atoi(chave) < raiz->info.CPF) {
+        return buscarFuncionario(raiz->esq, chave, tipo);
+    } else if (tipo == 1 && strcasecmp(chave, raiz->info.Nome) > 0) {
+        return buscarFuncionario(raiz->dir, chave, tipo);
+    } else if (tipo == 2 && atoi(chave) > raiz->info.CPF) {
+        return buscarFuncionario(raiz->dir, chave, tipo);
+    }
+    return NULL;
 }
-/*--> END BUSCAR 'COM CPF NESSE CASO' <--*/
 
-/*--> ************************************************************************************************** <--*/
-/*--> ************************************************************************************************** <--*/
+/*End remover com ambos*/
 
-/*--> START LIMPAR TELA <--*/
-void limparTela() {
-    for (int i = 0; i < 40; i++) {
-        printf(" \n");
+
+void liberarArvore(No *raiz) {
+    if (raiz != NULL) {
+        liberarArvore(raiz->esq);
+        liberarArvore(raiz->dir);
+        free(raiz);
     }
 }
-/*--> END 'LIMPAR TELA' <--*/
 
-/*--> START INTRODUZIR FUNC DENTRO NO MAIN <--*/
-// void introduce()
-// {
-//     Info *info = (Info *)malloc(sizeof(Info));
-//     printf("Digite o nome do funcionário: ");
-//     scanf("%s", info->Nome);
-//     printf("Digite o CPF do funcionário: ");
-//     scanf("%d", &info->CPF);
-//     printf("Digite a profissão do funcionário: ");
-//     scanf("%s", info->Profissao);
-//     arvoreCPF = inserirCpf(arvoreCPF, info);
-//     arvoreNome = inserir(arvoreNome, info);
-//     limparTela();
-// }
-/*--> END INTRODUZIR FUNC DENTRO DO MAIN <--*/
+void liberarMemoria() {
+    liberarArvore(arvoreNome);
+    liberarArvore(arvoreCPF);
+}
 
-/*--> START REMOVER COM NOME NO MAIN <--*/
-// void removeFunName()
-// {
-//     char nome[50];
-//     printf("Digite o nome do funcionário: ");
-//     scanf("%s", nome);
-//     arvoreCPF = deleteNode(arvoreCPF, buscar(arvoreNome, nome)->info);
-//     arvoreNome = deleteNode(arvoreNome, buscar(arvoreNome, nome)->info);
-//     limparTela();
-// }
-/*--> END REMOVER COM NOME NO MAIN <--*/
+void listarFuncionarios(No *raiz_1, No *raiz_2) {
+    if (raiz_1 && raiz_2 != NULL) {
+        listarFuncionarios(raiz_1->esq,raiz_2->esq);
+        printf("ArvoreNome Nome: %s\tCPF: %d\tProfissão: %s\n", raiz_1->info.Nome, raiz_1->info.CPF, raiz_1->info.Profissao);
+        printf("ArvoreCPF Nome: %s\tCPF: %d\tProfissão: %s\n", raiz_2->info.Nome, raiz_2->info.CPF, raiz_2->info.Profissao);
+        listarFuncionarios(raiz_1->dir, raiz_2->dir);
+    }
+}
 
-/*--> START BUSCAR COM NOME NO MAIN <--*/
-// void searchFunName()
-// {
-//     char nome[50];
-//     printf("Digite o nome do funcionário: ");
-//     scanf("%s", nome);
-//     No *no = buscar(arvoreNome, nome);
-//     if (no != NULL)
-//     {
-//         printf("CPF: %d, Profissão: %s\n", no->info->CPF, no->info->Profissao);
-//     }
-//     else
-//     {
-//         printf("Funcionário não encontrado.\n");
-//     }
-// }
-/*--> END BUSCAR COM NOME NO MAIN <--*/
+int countNodes(No *root) {
+    if (root == NULL)
+        return 0;
+    else
+        return (countNodes(root->esq) + countNodes(root->dir) + 1);
+}
 
-/*--> START REMOVE COM CPF NO MAIN <--*/
-// void removeFunCpf()
-// {
-//     int cpf;
-//     printf("Digite o 'cpf' do funcionário: ");
-//     scanf("%d", cpf);
-//     No *no = buscarCpf(arvoreCPF, cpf);
-//     (no != NULL) ? printf("CPF: %d, Profissão: %s\n", no->info->CPF, no->info->Profissao) : printf("Funcionário não encontrado.\n");
-//     limparTela();
-// }
-/*--> END REMOVE COM CPF NO MAIN <--*/
-
-/*--> START BUSCAR COM CPF NO MAIN <--*/
-// void searchFunCpf()
-// {
-// }
-/*--> END BUSCAR COM CPF NO MAIN <--*/
-
-/*--> ************************************************************************************************** <--*/
-/*--> ************************************************************************************************** <--*/
 int main() {
-    // Criação do nó raiz
-    Info *info = malloc(sizeof(Info));
-    strcpy(info->Nome, "João");
-    info->CPF = 123456789;
-    No *raiz = inserirCpf(NULL, info);
+    
+    setlocale(LC_ALL, "Portuguese");
+    char entrada[100];
 
-    // Inserção de mais nós
-    Info *info2 = malloc(sizeof(Info));
-    strcpy(info2->Nome, "Maria");
-    info2->CPF = 987654321;
-    raiz = inserirCpf(raiz, info2);
+    //inserir dados testes
+    Info func1 = {12345678, "lucas", "cantor"};
+    Info func2 = {87654321, "minato", "Programador"};
+    arvoreNome = inserirFuncionario(arvoreNome, &func2);
+    arvoreCPF = inserirFuncionario(arvoreCPF, &func2);
+    arvoreNome = inserirFuncionario(arvoreNome, &func1);
+    arvoreCPF = inserirFuncionario(arvoreCPF, &func1);
 
-    // Busca de um nó
-    No *noEncontrado = buscarCpf(raiz, 987654321);
-    if (noEncontrado != NULL) {
-        printf("Nó encontrado: %s, %d\n", noEncontrado->info->Nome, noEncontrado->info->CPF);
-    } else {
-        printf("Nó não encontrado\n");
+    printf("********************Legenda**********************\n");
+    printf("*    'i' para introduzir novos FUNCIONÁRIOS     *\n");
+    printf("*    'r n' remover pelo NOME                    *\n");
+    printf("*    'r c' remover pelo CPF                     *\n");
+    printf("*    'b n' buscar pelo NOME                     *\n");
+    printf("*    'b c' buscar pelo CPF                      *\n");
+    printf("*    'l' para listar todos os funcionários      *\n");
+    printf("*    's' para sair do programa                  *\n");
+    printf("*************************************************\n");
+
+    while (1) {
+        printf("\nDigite um comando: ");
+        fgets(entrada, sizeof(entrada), stdin);
+        entrada[strcspn(entrada, "\n")] = '\0';
+
+        if (entrada[0] == 's') {
+            break;
+        } else if (verificaComando(entrada)) {
+            char nome[50];
+            int cpf;
+            char cpf_buffer[12];
+            char profissao[30];
+
+            // Utilize sscanf diretamente para ler os três argumentos
+            sscanf(entrada + 2, "%49s %d %29s", nome, &cpf, profissao);
+            sprintf(cpf_buffer, "%d", cpf);
+
+            Info novoFuncionario;
+            novoFuncionario.CPF = cpf;
+            strcpy(novoFuncionario.Nome, nome);
+            strcpy(novoFuncionario.Profissao, profissao);
+
+            arvoreNome = inserirFuncionario(arvoreNome, &novoFuncionario);
+            arvoreCPF = inserirFuncionario(arvoreCPF, &novoFuncionario);
+
+            printf("Funcionario adicionado com sucesso!\n");
+        } else if (entrada[0] == 'r') {
+            char chave[50];
+            int tipo;
+
+            if (entrada[2] == 'n') {
+                sscanf(entrada + 4, "%49s", chave);
+                tipo = 1; // 1 para nome
+            } else if (entrada[2] == 'c') {
+                sscanf(entrada + 4, "%49s", chave);
+                tipo = 2; // 2 para CPF
+            } else {
+                printf("Comando invalido! Tente novamente.\n");
+                continue;
+            }
+
+            arvoreNome = removeFuncionario(arvoreNome, chave, tipo);
+            arvoreCPF = removeFuncionario(arvoreCPF, chave, tipo);
+
+            printf("Funcionario removido com sucesso!\n");
+        
+        }else if (entrada[0] == 'b') {
+            char chave[50];
+            int tipo;
+
+            if (entrada[2] == 'n') {
+                sscanf(entrada + 4, "%49s", chave);
+                tipo = 1; // 1 para nome
+            } else if (entrada[2] == 'c') {
+                sscanf(entrada + 4, "%49s", chave);
+                tipo = 2; // 2 para CPF
+            } else {
+                printf("Comando inválido! Tente novamente.\n");
+                continue;
+            }
+
+            No* resultado = buscarFuncionario(arvoreNome, chave, tipo);
+            if (resultado != NULL) {
+                printf("Funcionário encontrado: %s\tCPF: %d\tProfissão: %s\n", resultado->info.Nome, resultado->info.CPF, resultado->info.Profissao);
+            } else {
+                printf("Funcionário não encontrado!\n");
+            }
+        }
+ 
+        else if (strcmp(entrada, "l") == 0) {
+            listarFuncionarios(arvoreNome, arvoreCPF);
+            printf("quantidade de nó na arvore nome é: %d\n", countNodes(arvoreNome));
+            printf("quantidade de nó na arvore CPF é: %d\n", countNodes(arvoreCPF));
+        } else {
+            printf("Comando inválido! Tente novamente.\n");
+        }
     }
 
-    // Remoção de um nó
-    raiz = deleteNodeCpf(raiz, info2);
-
-    // Busca do mesmo nó após a remoção
-    noEncontrado = buscarCpf(raiz, 987654321);
-    if (noEncontrado != NULL) {
-        printf("Nó encontrado: %s, %d\n", noEncontrado->info->Nome, noEncontrado->info->CPF);
-    } else {
-        printf("Nó não encontrado\n");
-    }
-
-    // Liberação de memória
-    free(info);
-    free(info2);
-    free(raiz);
+    liberarMemoria();
 
     return 0;
 }
-
-/*o sistema estar com bug nos casos */
-/*teste os caso antes*/

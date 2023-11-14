@@ -67,7 +67,7 @@ int main() {
 
     struct TreeNode* root = createBinaryTree(sequence, &index);
 
-    printf("Caminhamento Pré-Fixo: ");
+    printf("Caminhamento Pre-Fixo: ");
     preorderTraversal(root);
     printf("\n");
 
@@ -75,7 +75,7 @@ int main() {
     inorderTraversal(root);
     printf("\n");
 
-    printf("Caminhamento Pré-Fixo: ");
+    printf("Caminhamento Pos-Fixo: ");
     postorderTraversal(root);
     printf("\n");
 
