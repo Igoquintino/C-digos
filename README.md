@@ -16,5 +16,7 @@
  ademais é isso.
 
  atualizando, as funções de remover e buscar em ambas as arvores estão corretas. 12/11/2023
+ atualizando, as funções estão devidamente funcionando, buscando e removendo o individuo, sem falar que o menu
+ estar devidamento como previsto na atividade. 14/11/2023
 
  De Igo Quintino
