@@ -16,7 +16,7 @@ Vale ressaltar que, na implementação atual, o código permite inserir, buscar 
 - **12/11/2023**: As funções de remoção e busca em ambas as árvores (CPF e NOME) estão funcionando corretamente.
 - **14/11/2023**: As funções de busca e remoção estão completamente operacionais, buscando e removendo o usuário conforme necessário. O menu também está de acordo com o que foi previsto na atividade.
 - **19/09/2024**: Lembrando que a Parte_I.c e Parte_II_Finalizado.c já estão `ok` ambas estão cumprindos os requisitos para requeridos no trabalho de estrutura de dados II
-- **Obs**: A Parte_II_Test_fase.c é só um teste, uma fase primaria do que seria o `Finalizado`, ou seja, as peripécias do trabalho :/
+- **Obs**: A Parte_II_Test_fase.c é só um teste, uma fase primaria do que seria a Parte_II `Finalizado`, ou seja, as peripécias do trabalho :/
 ---
 
 **De**: Igo Quintino
