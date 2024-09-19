@@ -1,7 +1,7 @@
 # Igo - Códigos
 ## Autor: Igo Quintino
 - **Nome**: Igo Quintino
-- **Aluno de**: Sistemas de Informação
+- **Aluno**: Sistemas de Informação
 - **Data de criação**: 06/11/2023
 
 ### Descrição do código
